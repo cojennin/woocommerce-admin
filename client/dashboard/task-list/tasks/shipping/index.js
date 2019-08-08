@@ -19,6 +19,7 @@ import { getHistory, getNewPath } from '@woocommerce/navigation';
  * Internal dependencies
  */
 import StoreLocation from './location';
+import ShippingLabels from './labels';
 import ShippingRates from './rates';
 import withSelect from 'wc-api/with-select';
 
@@ -129,12 +130,13 @@ class Shipping extends Component {
 		if ( nextStep ) {
 			this.setState( { step: nextStep.key } );
 		} else {
-			this.setState( { step: steps[ 0 ].key } );
 			getHistory().push( getNewPath( {}, '/', {} ) );
 		}
 	}
 
 	getSteps() {
+		const { countryCode } = this.props;
+
 		const steps = [
 			{
 				key: 'store_location',
@@ -158,6 +160,17 @@ class Shipping extends Component {
 					/>
 				),
 				visible: true,
+			},
+			{
+				key: 'label_printing',
+				label: __( 'Enable shipping label printing', 'woocommerce-admin' ),
+				description: __(
+					'With WooCommerce Services and Jetpack you can save time at the' +
+						'Post Office by printing your shipping labels at home',
+					'woocommerce-admin'
+				),
+				content: <ShippingLabels completeStep={ this.completeStep } { ...this.props } />,
+				visible: [ 'US', 'GB', 'CA', 'AU' ].includes( countryCode ),
 			},
 		];
 
